@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>巴黎旅遊英文測驗 - 隨機題庫版</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      padding: 20px;
+      background: #f0f8ff;
+    }
+    .quiz-container {
+      background: white;
+      max-width: 650px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; color: #2c3e50; font-size: 24px; }
+    h2 { font-size: 18px; color: #34495e; margin-bottom: 20px; line-height: 1.5; }
+    .option {
+      margin: 12px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .option:hover { background: #f9f9f9; }
+    .option label { cursor: pointer; display: block; width: 100%; }
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #3498db;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { background: #2980b9; }
+    button:disabled { background: #bdc3c7; cursor: not-allowed; }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+      min-height: 24px;
+    }
+    .progress {
+      text-align: right;
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>巴黎旅遊英文測驗</h1>
+    <div id="progress" class="progress"></div>
+    <h2 id="question">載入中...</h2>
+    <div id="audioBox"></div>
+    <form id="quizForm"></form>
+    <button id="submitBtn" type="button" onclick="checkAnswer()">提交答案</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // 整合後的 10 題題庫
+    const questions = [
+      {
+        question: "1. When is John going to Paris?",
+        options: ["Tomorrow", "In a month", "In a week", "In two weeks"],
+        correct: "In a month"
+      },
+      {
+        question: "2. What does Stephanie say about signs and maps?",
+        options: ["They are cheap.", "They will tell John where to buy tickets.", "They are difficult for foreigners to read.", "They are printed in many different languages."],
+        correct: "They are printed in many different languages."
+      },
+      {
+        question: "3. What will John need to buy a ticket from one of the machines?",
+        options: ["A Metro pass", "Francs", "A credit card", "Help from an employee"],
+        correct: "A credit card"
+      },
+      {
+        question: "4. How often does John say he will probably ride the Metro?",
+        options: ["Every day", "Once in two weeks", "twice a week", "For a long trip"],
+        correct: "Every day"
+      },
+      {
+        question: "5. How does John feel after talking to Stephanie?",
+        options: ["Questionable", "Confident", "Confused", "Ignorant"],
+        correct: "Confident"
+      },
+      {
+        question: "6. (Vocabulary) I will go to Paris for a ________ tomorrow.",
+        options: ["vacation", "company", "signature", "subway"],
+        correct: "vacation"
+      },
+      {
+        question: "7. (Vocabulary) The ________ from Paris teaches French in Taiwan.",
+        options: ["forever", "focus", "foreigner", "follower"],
+        correct: "foreigner"
+      },
+      {
+        question: "8. (Vocabulary) I always take a ________ to the city center in Paris.",
+        options: ["subject", "subway", "submarine", "success"],
+        correct: "subway"
+      },
+      {
+        question: "9. (Vocabulary) I always take an underground to ________ the crowds at the rush hours.",
+        options: ["available", "average", "arrive", "avoid"],
+        correct: "avoid"
+      },
+      {
+        question: "10. (Vocabulary) There are so many ________ visiting Paris during summer vacation.",
+        options: ["tools", "tourists", "together", "tattoos"],
+        correct: "tourists"
+      }
+    ];
+
+    let shuffledQuestions = [];
+    let currentQuestion = 0;
+    let score = 0;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function startQuiz() {
+      shuffledQuestions = shuffle([...questions]); 
+      currentQuestion = 0;
+      score = 0;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = shuffledQuestions[currentQuestion];
+      document.getElementById("question").innerText = q.question;
+      document.getElementById("progress").innerText = `第 ${currentQuestion + 1} 題 / 共 ${shuffledQuestions.length} 題`;
+
+      const audioBox = document.getElementById("audioBox");
+      audioBox.innerHTML = q.audio ? `<audio controls><source src="${q.audio}" type="audio/mpeg"></audio>` : "";
+
+      const form = document.getElementById("quizForm");
+      form.innerHTML = "";
+      
+      // 選項也會隨機排序
+      shuffle([...q.options]).forEach(opt => {
+        const div = document.createElement("div");
+        div.classList.add("option");
+        div.innerHTML = `
+          <label>
+            <input type="radio" name="answer" value="${opt}"> ${opt}
+          </label>
+        `;
+        form.appendChild(div);
+      });
+      document.getElementById("result").innerHTML = "";
+      document.getElementById("submitBtn").disabled = false;
+    }
+
+    function checkAnswer() {
+      const result = document.getElementById("result");
+      const selectedOption = document.querySelector('input[name="answer"]:checked');
+
+      if (!selectedOption) {
+        result.innerHTML = "⚠️ 請選擇一個答案！";
+        result.style.color = "orange";
+        return;
+      }
+
+      const selected = selectedOption.value;
+      const correct = shuffledQuestions[currentQuestion].correct;
+
+      if (selected === correct) {
+        score++;
+        result.innerHTML = "✅ 正確！";
+        result.style.color = "green";
+      } else {
+        result.innerHTML = "❌ 錯誤！正確答案是: " + correct;
+        result.style.color = "red";
+      }
+
+      document.getElementById("submitBtn").disabled = true;
+
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < shuffledQuestions.length) {
+          loadQuestion();
+        } else {
+          showFinalScore();
+        }
+      }, 1500);
+    }
+
+    function showFinalScore() {
+      const container = document.querySelector(".quiz-container");
+      let feedback = score >= 8 ? "太棒了！你非常了解巴黎旅遊！" : "再接再厲！複習一下單字會更好。";
+      container.innerHTML = `
+        <h1>🎉 測驗完成！</h1>
+        <div style="text-align:center; margin: 20px 0;">
+            <p style="font-size: 24px;">您的得分: <strong>${score}</strong> / ${shuffledQuestions.length}</p>
+            <p>${feedback}</p>
+        </div>
+        <button type="button" onclick="location.reload()">重新挑戰</button>
+      `;
+    }
+
+    window.onload = startQuiz;
+  </script>
+</body>
+</html>

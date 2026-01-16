@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>對話練習 - Paris Trip</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
+            background-color: #f0f7ff;
+            background-image: repeating-linear-gradient(
+                45deg, 
+                transparent, 
+                transparent 25px, 
+                rgba(0, 123, 255, 0.03) 25px, 
+                rgba(0, 123, 255, 0.03) 26px
+            );
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .dialogue-container {
+            width: 95%;
+            max-width: 800px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .progress-info { 
+            color: #1a5276; 
+            font-weight: bold; 
+            font-size: 1.3em; 
+        }
+
+        .dialogue-screen {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .speech-bubble {
+            padding: 30px;
+            border-radius: 25px;
+            position: relative;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .speech-bubble.left {
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+            border-left: 10px solid #007bff;
+        }
+
+        .speech-bubble.right {
+            align-self: flex-end;
+            background: #e3f2fd;
+            border-bottom-right-radius: 0;
+            border-right: 10px solid #00c853;
+        }
+
+        .speaker-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #546e7a;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .text-en {
+            font-size: 2em; /* 超大字體 */
+            color: #2c3e50;
+            line-height: 1.3;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .text-zh {
+            font-size: 1.5em; /* 超大翻譯字體 */
+            color: #607d8b;
+            padding-top: 15px;
+            border-top: 2px dashed #cfd8dc;
+            margin-bottom: 20px;
+        }
+
+        .bubble-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid #007bff;
+            color: #007bff;
+            border-radius: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .navigation-controls {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 15px 45px;
+            border-radius: 50px;
+            border: none;
+            background: #90a4ae;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3em;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .nav-btn.next {
+            background: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dialogue-container">
+        <div class="top-nav">
+            <button style="border:none; background:none; cursor:pointer; color:#007bff; font-weight:bold; font-size:1.2em;" onclick="location.href='learning-menu.html'">🏠 返回選單</button>
+            <div class="progress-info">頁數：<span id="page-num">1</span> / <span id="total-pages"></span></div>
+        </div>
+
+        <div id="dialogue-screen" class="dialogue-screen"></div>
+
+        <div class="navigation-controls">
+            <button class="nav-btn" id="prevBtn" onclick="changePage(-1)">上一頁</button>
+            <button class="nav-btn next" id="nextBtn" onclick="changePage(1)">下一頁</button>
+        </div>
+    </div>
+
+    <script>
+        const dialogues = [
+            { speaker: "John", en: "Hi, Stephanie. I have some great news! I’m going on vacation soon.", zh: "嗨，Stephanie。我有個好消息！我很快要去度假了。" },
+            { speaker: "Stephanie", en: "That’s great, John! Where are you going? When will you leave?", zh: "太棒了，John！你要去哪裡？什麼時候出發？" },
+            { speaker: "John", en: "I'm going to Paris in a month. I know you've been there, and I want to ask you a few questions.", zh: "我一個月後要去巴黎。我知道你曾去過那裡，我想問你幾個問題。" },
+            { speaker: "Stephanie", en: "Sure, John. I’ll try to help you.", zh: "當然可以，John。我會盡力幫你。" },
+            { speaker: "John", en: "Thank you. How hard is it to navigate the subway?", zh: "謝謝你。地鐵導航有多難呢？" },
+            { speaker: "Stephanie", en: "Don’t worry. The Paris Metro is very convenient.", zh: "別擔心。巴黎地鐵（Metro）非常方便。" },
+            { speaker: "John", en: "The Metro – is that the name for the subway in Paris?", zh: "The Metro —— 這是巴黎地鐵的名稱嗎？" },
+            { speaker: "Stephanie", en: "That’s right. Paris City Government knows that many tourists and foreigners visit Paris, so there are signs and maps in many different languages.", zh: "沒錯。巴黎市政府知道有許多遊客和外國人造訪，所以隨處都有各種語言的指示牌和地圖。" },
+            { speaker: "John", en: "How does a passenger purchase a ticket? Is the price very high?", zh: "乘客要如何買票呢？票價很高嗎？" },
+            { speaker: "Stephanie", en: "Tickets are cheap. There are employees selling tickets at every station. At certain times of day, there are large crowds waiting for tickets, though.", zh: "票價很便宜。每個車站都有員工售票。不過在某些時段，排隊買票的人潮會很多。" },
+            { speaker: "John", en: "What should I do if that happens? Is there a way to avoid the crowd?", zh: "如果發生那種情況我該怎麼辦？有辦法避開人群嗎？" },
+            { speaker: "Stephanie", en: "There are also ticket machines that take credit cards. How long do you plan on being there? Do you think you’ll ride the train often?", zh: "還有可以使用信用卡的自動售票機。你打算待多久？你覺得你會常搭地鐵嗎？" },
+            { speaker: "John", en: "I will be there for two weeks, and I’ll probably ride it every day.", zh: "我會待兩週，而且可能每天都會搭。" },
+            { speaker: "Stephanie", en: "In that case, you should probably buy a book of tickets or a Metro pass. Which one you choose depends on how many rides you plan to take.", zh: "那樣的話，你應該買整本的套票或是地鐵週遊券。選擇哪一種取決於你預計搭乘的次數。" },
+            { speaker: "John", en: "Will a single train get me across the city? Will I need to change to another line for long trips?", zh: "一班火車就能帶我橫跨城市嗎？長途旅行需要換線嗎？" },
+            { speaker: "Stephanie", en: "You’ll probably have to transfer between lines. Just pay attention to the signs, and you’ll be fine.", zh: "你可能需要在不同線路間轉乘。只要留意指示牌就沒問題了。" },
+            { speaker: "John", en: "Thank you. You have been very helpful. I feel more confident now.", zh: "謝謝你。你幫了大忙。我現在覺得有信心多了。" }
+        ];
+
+        let currentPage = 0;
+        const linesPerPage = 2;
+
+        function renderPage() {
+            const screen = document.getElementById('dialogue-screen');
+            const totalPages = Math.ceil(dialogues.length / linesPerPage);
+            screen.innerHTML = ''; 
+
+            const start = currentPage * linesPerPage;
+            const pageLines = dialogues.slice(start, start + linesPerPage);
+
+            pageLines.forEach((item, index) => {
+                const isJohn = item.speaker === "John";
+                const bubble = document.createElement('div');
+                bubble.className = `speech-bubble ${isJohn ? "left" : "right"}`;
+                
+                bubble.innerHTML = `
+                    <span class="speaker-name">${item.speaker}</span>
+                    <div class="text-en">${item.en}</div>
+                    <div class="text-zh" id="zh-${index}" style="display:none;">${item.zh}</div>
+                    <div class="bubble-actions">
+                        <button class="action-btn" onclick="speakText('${item.en.replace(/'/g, "\\'")}')">🔊 發音</button>
+                        <button class="action-btn" onclick="toggleTranslation(${index})">文 翻譯</button>
+                    </div>
+                `;
+                screen.appendChild(bubble);
+            });
+
+            document.getElementById('page-num').innerText = currentPage + 1;
+            document.getElementById('total-pages').innerText = totalPages;
+            document.getElementById('prevBtn').style.visibility = currentPage === 0 ? "hidden" : "visible";
+            document.getElementById('nextBtn').innerText = (currentPage === totalPages - 1) ? "完成練習" : "下一頁";
+        }
+
+        function changePage(step) {
+            const totalPages = Math.ceil(dialogues.length / linesPerPage);
+            if (currentPage + step >= 0 && currentPage + step < totalPages) {
+                currentPage += step;
+                renderPage();
+                window.scrollTo(0,0);
+            } else if (currentPage + step === totalPages) {
+                alert("恭喜！您已讀完這段巴黎之旅的對話。");
+                location.href = 'learning-menu.html';
+            }
+        }
+
+        function toggleTranslation(index) {
+            const zhText = document.getElementById(`zh-${index}`);
+            zhText.style.display = zhText.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 使用瀏覽器內建合成發音 (不需要外部音檔)
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            msg.rate = 0.9; // 語速稍微放慢一點
+            window.speechSynthesis.speak(msg);
+        }
+
+        renderPage();
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地鐵單字複習 - Subway Vocabulary</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
+            background-color: #f0f7ff;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 25px, rgba(0, 123, 255, 0.03) 25px, rgba(0, 123, 255, 0.03) 26px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .vocab-container {
+            width: 95%;
+            max-width: 800px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e1f5fe;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background: linear-gradient(to right, #007bff, #00c853);
+        }
+
+        .word-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .word-main {
+            font-size: 2.8em;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+
+        .ipa {
+            font-size: 1.5em;
+            color: #546e7a;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .pos {
+            font-style: italic;
+            font-size: 1.2em;
+            color: #78909c;
+        }
+
+        .chinese-def {
+            font-size: 2em;
+            font-weight: bold;
+            color: #263238;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .word-image-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .word-image {
+            max-width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .example-section {
+            background: #f9fbfd;
+            padding: 25px;
+            border-radius: 20px;
+            border-left: 8px solid #007bff;
+        }
+
+        .ex-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .ex-en {
+            font-size: 1.4em;
+            color: #01579b;
+            line-height: 1.3;
+        }
+
+        .ex-zh {
+            font-size: 1.2em;
+            color: #546e7a;
+            padding-left: 55px;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .nav-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: #cfd8dc;
+            cursor: not-allowed;
+        }
+
+        .audio-btn {
+            background: #eceff1;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .audio-btn:hover { background: #e1f5fe; transform: scale(1.1); }
+
+        .home-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        @media (max-width: 600px) {
+            .word-main { font-size: 2em; }
+            .vocab-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="vocab-container">
+        <div class="top-bar"></div>
+        <button class="home-btn" onclick="alert('返回主選單')">🏠 返回選單</button>
+
+        <div id="word-card"></div>
+
+        <div class="footer-nav">
+            <button class="nav-btn" id="prevBtn" onclick="changeWord(-1)">← 上一個</button>
+            <div id="progress" style="font-weight: bold; font-size: 1.1em; color: #546e7a;">1 / 32</div>
+            <button class="nav-btn" id="nextBtn" onclick="changeWord(1)">下一個 →</button>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            { word: "pretty", ipa: "/ˈprɪt.i/", pos: "(adj.)", zh: "漂亮的", image: "https://images.unsplash.com/photo-1473163922524-246e922bc940?w=800", exEn: "The view from the subway bridge is pretty.", exZh: "從地鐵橋上看到的風景很漂亮。" },
+            { word: "take", ipa: "/teɪk/", pos: "(v.)", zh: "搭乘", image: "https://images.unsplash.com/photo-1542385151-efd9000785a0?w=800", exEn: "I take the subway to work every day.", exZh: "我每天搭地鐵上班。" },
+            { word: "subway", ipa: "/ˈsʌb.weɪ/", pos: "(n.)", zh: "地鐵", image: "https://images.unsplash.com/photo-1444858291040-58f756a3bdd6?w=800", exEn: "The subway system in Tokyo is very efficient.", exZh: "東京的地鐵系統非常高效。" },
+            { word: "get off", ipa: "/ɡɛt ɔf/", pos: "(phr.v.)", zh: "下車", image: "https://images.unsplash.com/photo-1556122071-e404be745493?w=800", exEn: "I’ll get off at the next stop.", exZh: "我會在下一站下車。" },
+            { word: "get on", ipa: "/ɡɛt ɑn/", pos: "(phr.v.)", zh: "上車", image: "https://images.unsplash.com/photo-1517615964092-2334860b29ce?w=800", exEn: "Let’s get on the train before the doors close.", exZh: "我們趕快上車，門快關了。" },
+            { word: "direction", ipa: "/daɪˈrɛk.ʃən/", pos: "(n.)", zh: "方向", image: "https://images.unsplash.com/photo-1506146332389-18140ed7b3fb?w=800", exEn: "Can you give me directions to the museum?", exZh: "你可以告訴我去博物館的方向嗎？" },
+            { word: "visit", ipa: "/ˈvɪz.ɪt/", pos: "(v.)", zh: "拜訪；參觀", image: "https://images.unsplash.com/photo-1526129318478-62ed807ebdf9?w=800", exEn: "I want to visit all the famous landmarks in London.", exZh: "我想參觀倫敦所有著名的地標。" },
+            { word: "platform", ipa: "/ˈplæt.fɔːrm/", pos: "(n.)", zh: "月台", image: "https://images.unsplash.com/photo-1453904300235-0f2f60b15b5d?w=800", exEn: "The train will arrive at platform 3.", exZh: "列車將停靠在3號月台。" },
+            { word: "turnstile", ipa: "/ˈtɝːn.staɪl/", pos: "(n.)", zh: "旋轉閘門", image: "https://images.unsplash.com/photo-1610996843477-96a94167e89e?w=800", exEn: "You need to swipe your card to pass through the turnstile.", exZh: "你需要刷地鐵卡才能通過旋轉閘門。" },
+            { word: "fare gate", ipa: "/fɛr ɡeɪt/", pos: "(n.)", zh: "收費閘門", image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800", exEn: "The fare gate opens when you tap your card.", exZh: "當你刷卡時，收費閘門會打開。" },
+            { word: "ticket machine", ipa: "/ˈtɪkɪt məˈʃiːn/", pos: "(n.)", zh: "自動售票機", image: "https://images.unsplash.com/photo-1520105072000-f44fc083e50b?w=800", exEn: "You can buy a ticket from the ticket vending machine.", exZh: "你可以在自動售票機購買車票。" },
+            { word: "card reader", ipa: "/kɑːrd ˈriː.dɚ/", pos: "(n.)", zh: "卡片讀取機", image: "https://images.unsplash.com/photo-1556742031-c6961e8560b0?w=800", exEn: "Tap your card on the card reader to enter.", exZh: "請在卡片讀取機上刷卡進站。" },
+            { word: "handrail", ipa: "/ˈhænd.reɪl/", pos: "(n.)", zh: "扶手", image: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800", exEn: "Hold the handrail when the train starts moving.", exZh: "當列車開始移動時，請握住扶手。" },
+            { word: "grab pole", ipa: "/ɡræb poʊl/", pos: "(n.)", zh: "抓握桿", image: "https://images.unsplash.com/photo-1494515426402-f1980ace7a9c?w=800", exEn: "Stand passengers should hold onto the grab pole.", exZh: "站立的乘客應該抓住抓握桿。" },
+            { word: "emergency button", ipa: "/ɪˈmɝː.dʒən.si ˈbʌt̬.ən/", pos: "(n.)", zh: "緊急按鈕", image: "https://images.unsplash.com/photo-1582139329536-e7284fece509?w=800", exEn: "Press the emergency button only in case of danger.", exZh: "只有在危險情況下才按緊急按鈕。" },
+            { word: "intercom", ipa: "/ˈɪn.t̬ɚ.kɑːm/", pos: "(n.)", zh: "對講機", image: "https://images.unsplash.com/photo-1534536281715-e28d76689b4d?w=800", exEn: "Use the intercom to contact the train operator.", exZh: "使用對講機聯絡列車操作員。" },
+            { word: "route map", ipa: "/ruːt mæp/", pos: "(n.)", zh: "路線圖", image: "https://images.unsplash.com/photo-1543165796-5426273eaab3?w=800", exEn: "The route map shows all the subway lines.", exZh: "路線圖顯示所有地鐵線路。" },
+            { word: "LED display", ipa: "/ɛl iː diː dɪˈspleɪ/", pos: "(n.)", zh: "LED顯示屏", image: "https://images.unsplash.com/photo-1522441815192-d9f04eb0615c?w=800", exEn: "The LED display shows the next station.", exZh: "LED顯示屏顯示下一站資訊。" },
+            { word: "announcement", ipa: "/əˈnaʊns.mənt/", pos: "(n.)", zh: "廣播系統", image: "https://images.unsplash.com/photo-1478737270239-2fccd27ee086?w=800", exEn: "The announcement system informs passengers.", exZh: "廣播系統通知乘客列車到站資訊。" },
+            { word: "ventilation", ipa: "/ˌvɛn.t̬ɪˈleɪ.ʃən/", pos: "(n.)", zh: "通風系統", image: "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=800", exEn: "The ventilation system keeps fresh air flowing.", exZh: "通風系統保持列車內的空氣流通。" },
+            { word: "priority seat", ipa: "/praɪˈɔːr.ə.t̬i siːt/", pos: "(n.)", zh: "博愛座", image: "https://images.unsplash.com/photo-1508962914676-139429cf6978?w=800", exEn: "Please give up the priority seat to elderly passengers.", exZh: "請讓座給年長的乘客。" },
+            { word: "automatic doors", ipa: "/ˌɔː.t̬əˈmæt̬.ɪk/", pos: "(n.)", zh: "自動門", image: "https://images.unsplash.com/photo-1563290350-0255b7194f1c?w=800", exEn: "Stand clear of the automatic doors.", exZh: "當自動門關閉時，請保持距離。" },
+            { word: "conductor's cabin", ipa: "/kənˈdʌk.tɚz/", pos: "(n.)", zh: "列車駕駛室", image: "https://images.unsplash.com/photo-1474487056236-0529c99a78a1?w=800", exEn: "Only subway employees can enter the cabin.", exZh: "只有地鐵員工可以進入列車駕駛室。" },
+            { word: "luggage rack", ipa: "/ˈlʌɡ.ɪdʒ ræk/", pos: "(n.)", zh: "行李架", image: "https://images.unsplash.com/photo-1581553674786-636ad0e27b40?w=800", exEn: "You can put your backpack on the luggage rack.", exZh: "你可以把背包放在行李架上。" },
+            { word: "security camera", ipa: "/sɪˈkjʊr.ə.t̬i/", pos: "(n.)", zh: "監視攝影機", image: "https://images.unsplash.com/photo-1552056752-05bc3ec06660?w=800", exEn: "Security cameras are installed for safety.", exZh: "監視攝影機是為了乘客安全而設置的。" },
+            { word: "exit sign", ipa: "/ˈɛk.sɪt saɪn/", pos: "(n.)", zh: "出口標誌", image: "https://images.unsplash.com/photo-1563810023023-e69c0205e834?w=800", exEn: "Follow the exit signs to leave the station.", exZh: "請按照出口標誌離開車站。" },
+            { word: "escalator", ipa: "/ˈɛs.kə.leɪ.t̬ɚ/", pos: "(n.)", zh: "手扶梯", image: "https://images.unsplash.com/photo-1444858445484-959951167123?w=800", exEn: "Stand on the right side of the escalator.", exZh: "請站在手扶梯的右側。" },
+            { word: "elevator", ipa: "/ˈɛl.ə.veɪ.t̬ɚ/", pos: "(n.)", zh: "電梯", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800", exEn: "The elevator is for passengers with disabilities.", exZh: "電梯是為行動不便的乘客設計的。" },
+            { word: "ticket booth", ipa: "/ˈtɪk.ɪt buːθ/", pos: "(n.)", zh: "售票亭", image: "https://images.unsplash.com/photo-1551355419-fcc9862276a1?w=800", exEn: "You can buy a ticket from the ticket booth.", exZh: "你可以在售票亭購買車票。" },
+            { word: "lost and found", ipa: "/lɔːst ənd faʊnd/", pos: "(n.)", zh: "失物招領處", image: "https://images.unsplash.com/photo-1563911302283-d2bc129e7570?w=800", exEn: "Check the lost and found if you lose something.", exZh: "如果你遺失了物品，請去失物招領處查看。" },
+            { word: "waiting area", ipa: "/ˈweɪ.tɪŋ ˈɛr.i.ə/", pos: "(n.)", zh: "等候區", image: "https://images.unsplash.com/photo-1563089145-599997674d42?w=800", exEn: "Please wait in the waiting area.", exZh: "請在列車到站前，在等候區等候。" },
+            { word: "fire extinguisher", ipa: "/ˈfaɪr ɪkˈstɪŋ/", pos: "/n./", zh: "滅火器", image: "https://images.unsplash.com/photo-1518170858988-5182046556e9?w=800", exEn: "There is a fire extinguisher near the doors.", exZh: "列車門附近有滅火器。" }
+        ];
+
+        let currentIndex = 0;
+
+        function renderCard() {
+            const card = document.getElementById('word-card');
+            const item = vocabulary[currentIndex];
+
+            card.innerHTML = `
+                <div class="word-header">
+                    <span class="word-main">${item.word}</span>
+                    <span class="ipa">${item.ipa}</span>
+                    <span class="pos">${item.pos}</span>
+                    <button class="audio-btn" onclick="speak('${item.word.replace("'", "\\'")}')">🔊</button>
+                </div>
+                
+                <div class="chinese-def">${item.zh}</div>
+
+                <div class="word-image-container">
+                    <img src="${item.image}" class="word-image" alt="visual aid">
+                </div>
+
+                <div class="example-section">
+                    <div class="ex-item">
+                         <button class="audio-btn" style="width:35px; height:35px; font-size:0.9em;" onclick="speak('${item.exEn.replace(/'/g, "\\'")}')">🔊</button>
+                         <div class="ex-en">${item.exEn}</div>
+                    </div>
+                    <div class="ex-zh">${item.exZh}</div>
+                </div>
+            `;
+
+            document.getElementById('progress').innerText = `${currentIndex + 1} / ${vocabulary.length}`;
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').innerText = (currentIndex === vocabulary.length - 1) ? "重新開始" : "下一個 →";
+        }
+
+        function changeWord(step) {
+            if (currentIndex + step >= 0 && currentIndex + step < vocabulary.length) {
+                currentIndex += step;
+                renderCard();
+            } else if (currentIndex + step === vocabulary.length) {
+                alert("太棒了！地鐵單字全數複習完畢！🚇✨");
+                currentIndex = 0;
+                renderCard();
+            }
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            msg.rate = 0.8; 
+            window.speechSynthesis.speak(msg);
+        }
+
+        renderCard();
+    </script>
+</body>
+</html>

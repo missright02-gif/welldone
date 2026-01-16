@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trips & Traffic - 出遊與交通</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1>Trips & Traffic</h1>
+            <p>出遊與交通</p>
+            
+            <div class="navigation-buttons">
+                <button class="nav-button prev-button" onclick="goToPreviousPage()">
+                    &lt; 回平台
+                </button>
+                
+                <button class="nav-button next-button" onclick="goToNextPage()">
+                    學習趣 &gt;
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 導向下一頁 (學習選單)
+         */
+        function goToNextPage() {
+            // 實際使用時，請將 "learning-menu.html" 替換為您的選單檔案名稱
+            window.location.href = "learning-menu.html"; 
+            
+            // 測試時可以使用 alert：
+            // alert("正在導向下一頁 (學習選單)...");
+        }
+
+        /**
+         * 導向前一頁
+         */
+        function goToPreviousPage() {
+            // 這是首頁，通常沒有前一頁
+            alert("目前已在首頁，沒有前一頁內容。");
+            
+            // 如果這不是首頁，則使用以下程式碼：
+            // window.history.back(); // 返回瀏覽器歷史記錄中的上一頁
+        }
+    </script>
+
+</body>
+</html>

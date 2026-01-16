@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學習選單 - Trips & Traffic</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="menu-style.css"> </head>
+<body>
+
+    <div class="menu-container">
+        <h1>單元學習選單：出遊與交通</h1>
+        <p>請選擇您想練習的內容：</p>
+
+        <div class="menu-grid">
+            
+            <button class="menu-item dialogue" onclick="goToUnit('dialogue.html')">
+                <i class="icon">💬</i>
+                <h2>對話單元</h2>
+                <p>聆聽並練習情境對話</p>
+            </button>
+
+            <button class="menu-item vocabulary" onclick="goToUnit('vocabulary.html')">
+                <i class="icon">📚</i>
+                <h2>單字學習</h2>
+                <p>瀏覽本單元所有單字</p>
+            </button>
+
+            <button class="menu-item quiz" onclick="goToUnit('quiz.html')">
+                <i class="icon">✅</i>
+                <h2>單元測驗</h2>
+                <p>檢視學習成果與練習</p>
+            </button>
+            
+        </div>
+        
+        <button class="back-button" onclick="goToUnit('index.html')">
+            ← 返回首頁
+        </button>
+    </div>
+
+    <script>
+        function goToUnit(page) {
+            // 導向到對應的單元頁面
+            window.location.href = page;
+        }
+    </script>
+
+</body>
+</html>

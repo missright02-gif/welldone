@@ -1,0 +1,109 @@
+/* style.css */
+
+/* 基本樣式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', 'Microsoft JhengHei', sans-serif; /* 確保中文顯示正常 */
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+    overflow-x: hidden; /* 防止水平滾動條 */
+    height: 100vh;
+}
+
+/* Hero Section - 封面區塊 (佔滿整個視窗) */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 100vh; 
+    
+    /* 圖片設定：請將 'hero-background.jpg' 替換為您的圖片路徑 */
+    background-image: url('/佩芩教具/images/hero-background..png'); 
+    background-size: cover; /* 讓背景圖片覆蓋整個區塊 */
+    background-position: center center; /* 圖片居中 */
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white; /* 封面文字顏色 */
+    /* 文字陰影加深，確保在複雜背景圖上可讀 */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9); 
+}
+
+.hero-content {
+    z-index: 10; /* 確保內容在背景圖片上方 */
+}
+
+/* 💥 標題字體放大樣式 💥 */
+.hero-content h1 {
+    font-size: 5.5em; /* 大標題 */
+    margin-bottom: 5px;
+    letter-spacing: 3px;
+    font-weight: bold;
+}
+
+.hero-content p {
+    font-size: 1.8em; /* 副標題 */
+    margin-bottom: 50px; 
+}
+
+/* 翻頁按鈕容器 */
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 40px; /* 兩個按鈕之間的間距 */
+}
+
+/* 💥 翻頁按鈕通用樣式 (PREV, NEXT) 💥 */
+.nav-button {
+    background-color: rgba(255, 255, 255, 0.15); /* 半透明白色背景 */
+    color: white;
+    padding: 15px 40px;
+    border: 3px solid white; /* 白色邊框 */
+    border-radius: 50px; /* 圓角膠囊形狀 */
+    font-size: 1.5em; /* 字體放大 */
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* 增加輕微模糊效果，讓按鈕在背景前更突出 (非所有瀏覽器支持) */
+    backdrop-filter: blur(5px); 
+    text-transform: uppercase;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-button:hover {
+    background-color: rgba(255, 255, 255, 0.3); /* 滑鼠懸停時增加透明度 */
+    transform: scale(1.05); /* 輕微放大效果 */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 3.5em; /* 手機版標題調整 */
+    }
+
+    .hero-content p {
+        font-size: 1.5em;
+        margin-bottom: 30px;
+    }
+    
+    .navigation-buttons {
+        gap: 20px;
+        flex-direction: column; /* 手機上按鈕垂直排列 */
+        align-items: center;
+    }
+
+    .nav-button {
+        padding: 12px 30px;
+        font-size: 1.2em;
+        width: 80%; /* 按鈕佔據大部分寬度 */
+        max-width: 300px;
+    }
+}
